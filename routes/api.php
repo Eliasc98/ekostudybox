@@ -54,6 +54,11 @@ Route::get('admin/referrals/sales', [ReferralSaleController::class, 'listSales']
 Route::get('admin/referrals', [AdminReferralController::class, 'index']);
 Route::delete('admin/referrals/{id}', [AdminReferralController::class, 'deleteReferral']);
 
+// routes/api.php
+Route::post('admin/trial/activate', [TrialController::class, 'activateTrial']);
+Route::post('admin/trial/auto-deduct', [TrialController::class, 'autoDeduct']);
+
+
 
 
 
