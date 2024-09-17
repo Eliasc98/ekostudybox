@@ -35,7 +35,7 @@ class TestTypeController extends Controller
 
     public function store(Request $request)
     {
-        //
+        
         $data = $request->validate([
             'test_type_name' => 'required',
             'duration' => 'required',

@@ -157,6 +157,7 @@ Route::middleware('auth:sanctum')->group(function () {
    
     Route::post('assoc-management-cat/create/test', [TeacherController::class, 'Assoc_category_store_test']);
     Route::post('auth/school-management/school/student/bulk-registration/{school_id}', [TeacherController::class, 'bulkRegistration']);
+    
     //Class endpoints/////
     Route::get('admin/classes', [AdminClassController::class, 'index']); ///fetchall
     Route::post('admin/create/class', [AdminClassController::class, 'store']);
