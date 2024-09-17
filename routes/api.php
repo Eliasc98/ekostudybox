@@ -26,6 +26,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\GenerateCodeController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PayInfoController;
+use App\Http\Controllers\InfluencerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,13 @@ use App\Http\Controllers\PayInfoController;
 
 //// fetch all schools
 // Route::post('auth/school-management/school/student/bulk-registration/{school_id}', [TeacherController::class, 'bulkRegistration']);
+
+// routes/api.php
+Route::post('influencers/generate', [InfluencerController::class, 'generateCode']);
+Route::get('admin/influencers', [InfluencerController::class, 'listCodes']);
+
+Route::post('referrals/sale', [ReferralSaleController::class, 'trackSale']);
+Route::get('admin/referrals/sales', [ReferralSaleController::class, 'listSales']);
 
 
 
