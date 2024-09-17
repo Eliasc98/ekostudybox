@@ -27,6 +27,7 @@ use App\Http\Controllers\GenerateCodeController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PayInfoController;
 use App\Http\Controllers\InfluencerController;
+use App\Http\Controllers\AdminReferralController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,11 @@ Route::get('admin/influencers', [InfluencerController::class, 'listCodes']);
 
 Route::post('referrals/sale', [ReferralSaleController::class, 'trackSale']);
 Route::get('admin/referrals/sales', [ReferralSaleController::class, 'listSales']);
+
+// routes/api.php
+Route::get('admin/referrals', [AdminReferralController::class, 'index']);
+Route::delete('admin/referrals/{id}', [AdminReferralController::class, 'deleteReferral']);
+
 
 
 
