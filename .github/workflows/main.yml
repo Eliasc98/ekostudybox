@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Remove public folder
+        run: rm -rf sbox-backend/public
       
       - name: Copy files via SSH
         uses: appleboy/scp-action@master
@@ -18,7 +21,7 @@ jobs:
           host: ${{ secrets.KAMATERA_HOST }}
           username: ${{ secrets.KAMATERA_USER }}
           key: ${{ secrets.KAMATERA_KEY }}
-          source: "sboxv1/*"
+          source: "sbox-backend/*"
           target: "/var/www/sboxv1"
       
       - name: Run remote commands via SSH
