@@ -23,8 +23,6 @@ jobs:
           key: ${{ secrets.KAMATERA_KEY }}
           source: "sbox-backend/*"
           target: "/var/www/sboxv1"
-          exclude: |
-            sbox-backend/public 
       
       - name: Run remote commands via SSH
         uses: appleboy/ssh-action@v0.1.5
