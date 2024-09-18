@@ -49,6 +49,7 @@ Route::get('admin/influencers', [InfluencerController::class, 'listCodes']);
 
 Route::post('referrals/sale', [ReferralSaleController::class, 'trackSale']);
 Route::get('admin/referrals/sales', [ReferralSaleController::class, 'listSales']);
+Route::get('admin/referrals/influencersales', [ReferralSaleController::class, 'influencerSales']);
 
 // routes/api.php
 Route::get('admin/referrals', [AdminReferralController::class, 'index']);

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('referral_codes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('influencer_id');
+            $table->string('influencer_name');
             $table->string('code')->unique();
             $table->timestamps();
         });

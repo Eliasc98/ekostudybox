@@ -9,10 +9,10 @@ class ReferralCode extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['influencer_id', 'code'];
+    protected $fillable = ['influencer_id', 'influencer_name', 'code'];
 
-    public function influencer()
-    {
-        return $this->belongsTo(User::class, 'influencer_id');
-    }
+    // public function influencer()
+    // {
+    //     return $this->belongsTo(User::class, 'influencer_id');
+    // }
 }
