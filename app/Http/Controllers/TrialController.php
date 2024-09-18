@@ -19,7 +19,9 @@ class TrialController extends Controller
         $user->trial_active = true;
         $user->save();
 
-        return response()->json(['message' => 'Trial activated for 30 days']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Trial activated for 30 days']);
     }
 
     public function autoDeduct()
@@ -36,6 +38,8 @@ class TrialController extends Controller
             // Deduct payment logic here
         }
 
-        return response()->json(['message' => 'Auto deduction process completed']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Auto deduction process completed']);
     }
 }
