@@ -18,8 +18,10 @@ jobs:
           host: ${{ secrets.KAMATERA_HOST }}
           username: ${{ secrets.KAMATERA_USER }}
           key: ${{ secrets.KAMATERA_KEY }}
-          source: "sboxv1/*"
+          source: "sbox-backend/*"
           target: "/var/www/sboxv1"
+          exclude: |
+            sbox-backend/public 
       
       - name: Run remote commands via SSH
         uses: appleboy/ssh-action@v0.1.5
