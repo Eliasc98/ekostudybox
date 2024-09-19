@@ -9,15 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
     public function up(): void
     {
         Schema::create('referral_sales', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('referral_code_id');
+            $table->foreign('referral_code_id');
             $table->decimal('amount', 10, 2);
             $table->timestamps();
-
-            $table->foreign('referral_code_id')->references('id')->on('referral_codes');
         });
     }
 

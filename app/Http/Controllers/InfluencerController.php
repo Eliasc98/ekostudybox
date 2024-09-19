@@ -14,8 +14,8 @@ class InfluencerController extends Controller
     public function generateCode(Request $request)
     {
         $request->validate([
-            'influencer_id' => 'required|exists:users,id',
-        ]);
+            'influencer_name' => 'required|unique:referral_codes,influencer_name',
+        ]);      
 
 
         //generate influencer's id        
@@ -37,22 +37,42 @@ class InfluencerController extends Controller
             $randomString .= $characters[rand(0, strlen($characters) - 1)];
         }
 
-        ReferralCode::create([
+       $data = ReferralCode::create([
             'influencer_id' => $code,
             'influencer_name' => $request->influencer_name,
             'code' => $randomString,
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Referral code generated', 
-            'code' => $code
-        ]);
+        if ($data) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Influencer referral code generated successfully',
+                'code' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unable to generate code, please try again later'
+            ], 500);
+        }
+
     }
 
     public function listCodes()
     {
         $codes = ReferralCode::with('influencer')->get();
-        return response()->json($codes);
+
+        if ($codes -> isNotEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Influencer referral codes fetched successfully',
+                'code' => $codes
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No referral code available, please create an influencer code'
+            ], 500);
+        }
     }
 }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('referral_codes', function (Blueprint $table) {
             $table->id();
             $table->string('influencer_name');
+            $table->integer('influencer_id');
             $table->string('code')->unique();
             $table->timestamps();
         });

@@ -9,12 +9,47 @@ class AdminReferralController extends Controller
     public function index()
     {
         $referrals = ReferralCode::withCount('referralSales')->get();
-        return response()->json($referrals);
+
+        if ($referrals->isNotEmpty()) {
+
+            $response = [
+                'status' => 'success',
+                'message' => 'data fetched successfully',
+                'data' => $referrals
+            ];
+
+            return response()->json($response);
+        } else {
+
+            $response = [
+                'status' => 'failed',
+                'message' => 'unable to fetch data'
+            ];
+
+            return response()->json($response, 404);
+        }
+
     }
 
     public function deleteReferral($id)
     {
-        ReferralCode::findOrFail($id)->delete();
-        return response()->json(['message' => 'Referral deleted']);
+       $deleteData = ReferralCode::findOrFail($id)->delete();
+
+        if ($deleteData) {
+            $response = [
+                'status' => 'success',
+                'message' => 'referral deleted successfully'                
+            ];
+
+            return response()->json($response);
+        } else {
+            $response = [
+                'status' => 'failed',
+                'message' => 'unable to delete referral'
+            ];
+
+            return response()->json($response, 404);
+        }
+        
     }
 }

@@ -38,15 +38,23 @@ class TrialController extends Controller
                       ->get();
 
         foreach ($users as $user) {
-            // Deduct the fee (example logic)
-            $user->trial_active = false;
-            $user->save();
+            try {
+            
+                $user->trial_active = false;
+                $user->save();
 
-            // Deduct payment logic here
+                // Deduct payment logic here
+                
+            } catch (\Exception $e) {
+               
+                \Log::error('Error processing auto deduction for user ID: ' . $user->id . ' - ' . $e->getMessage());
+            }
+            
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Auto deduction process completed']);
+            'message' => 'Auto deduction process completed'
+        ]);
     }
 }
