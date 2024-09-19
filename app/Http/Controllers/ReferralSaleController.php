@@ -12,25 +12,37 @@ class ReferralSaleController extends Controller
     //
 
     public function trackSale(Request $request)
-    {
-        $request->validate([
-            'referral_code' => 'required|exists:referral_codes,code',
-            'amount' => 'required|numeric',
-        ]);
-
+    {       
         $referralCode = ReferralCode::where('code', $request->referral_code)->first();
 
         ReferralSale::create([
-            'referral_code_id' => $referralCode->id,
+            'referral_code_id' => $referralCode->code,
             'amount' => $request->amount,
         ]);
 
-        return response()->json(['message' => 'Sale tracked successfully']);
+        return response()->json(['status' => 'success','message' => 'Sale tracked successfully']);
+    }
+
+    public function influencerSales(){
+        
+        $influencer = auth()->user();
+        $sales = ReferralSale::with('referralCode')->where('referral_code_id',$influencer->influencer_id)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data fetched Successfully', 
+            'data' => $sales
+        ]);
     }
 
     public function listSales()
     {
         $sales = ReferralSale::with('referralCode')->get();
-        return response()->json($sales);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data fetched Successfully', 
+            'data' => $sales
+        ]);
     }
 }
