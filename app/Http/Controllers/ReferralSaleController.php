@@ -19,17 +19,50 @@ class ReferralSaleController extends Controller
 
         $referralCode = ReferralCode::where('code', $request->referral_code)->first();
 
-        ReferralSale::create([
+        $data = ReferralSale::create([
             'referral_code_id' => $referralCode->id,
             'amount' => $request->amount,
         ]);
 
-        return response()->json(['message' => 'Sale tracked successfully']);
+        if ($data) {
+            $response = [
+                'status' => 'success',
+                'message' => 'Sale record created successfully',
+                'data' =>  $data
+            ];
+
+            return response()->json($response);
+        } else {
+            $response = [
+                'status' => 'failed',
+                'message' => 'unable to create sales record'
+            ];
+            return response()->json($response, 404);
+        }
+
     }
 
     public function listSales()
     {
         $sales = ReferralSale::with('referralCode')->get();
-        return response()->json($sales);
+
+        if ($sales -> isNotEmpty()) {
+            $response = [
+                'status' => 'success',
+                'message' => 'referral sales fetched successfully',
+                'data' =>  $sales
+            ];
+
+            return response()->json($response);
+        } else {
+
+            $response = [
+                'status' => 'failed',
+                'message' => 'unable to fetch sales'
+            ];
+            
+            return response()->json($response, 404);
+        }
+
     }
 }

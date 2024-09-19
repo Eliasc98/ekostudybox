@@ -17,11 +17,18 @@ class TrialController extends Controller
         $user = User::find($request->user_id);
         $user->trial_ends_at = Carbon::now()->addDays(30);
         $user->trial_active = true;
-        $user->save();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Trial activated for 30 days']);
+        if ($user->save()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Trial activated for 30 days'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unable to activate trial, please try again later'
+            ], 500);
+        }
     }
 
     public function autoDeduct()
