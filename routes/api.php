@@ -44,6 +44,13 @@ use App\Http\Controllers\AdminReferralController;
 // Route::post('auth/school-management/school/student/bulk-registration/{school_id}', [TeacherController::class, 'bulkRegistration']);
 
 // routes/api.php
+
+Route::get('/message', function (){
+    $mess = "this works";
+
+    return $mess;
+}); 
+
 Route::post('influencers/generate', [InfluencerController::class, 'generateCode']);
 Route::get('admin/influencers', [InfluencerController::class, 'listCodes']);
 
