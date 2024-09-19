@@ -60,7 +60,7 @@ class InfluencerController extends Controller
 
     public function listCodes()
     {
-        $codes = ReferralCode::with('influencer')->get();
+        $codes = ReferralCode::get();
 
         if ($codes -> isNotEmpty()) {
             return response()->json([
