@@ -1,0 +1,24 @@
+name: FTP Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger deployment
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./ekostudybox  # The local directory you want to upload
+        server-dir: /public_html/ekostudybox.ulearnlms.net  # The directory in cPanel where files should be uploaded
+
