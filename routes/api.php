@@ -28,6 +28,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PayInfoController;
 use App\Http\Controllers\InfluencerController;
 use App\Http\Controllers\AdminReferralController;
+use App\Http\Controllers\EkostudyAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,8 @@ Route::delete('admin/referrals/{id}', [AdminReferralController::class, 'deleteRe
 // routes/api.php
 Route::post('admin/trial/activate', [TrialController::class, 'activateTrial']);
 Route::post('admin/trial/auto-deduct', [TrialController::class, 'autoDeduct']);
+
+Route::get('auth/fetch-school-by-district', [EkostudyAdminController::class, 'getSchoolsByDistrict']);
 
 
 
