@@ -6,6 +6,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\District;
 
 class Admin extends Model
 {
@@ -21,9 +22,8 @@ class Admin extends Model
         'username',
         'email',
         'state',
-        'lga',
+        'district_id',
         'role',
-        'chapter_code',
         'school_id',
         'password'
     ];
@@ -51,6 +51,10 @@ class Admin extends Model
     public function login()
     {
         return $this->hasMany(AdminLogin::class, 'admin_id');
+    }
+
+    public function district(){
+        return $this->belongsTo(District::class);
     }
 
     public function topic()

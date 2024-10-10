@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AuthUser;
 
 use App\Models\User;
 use App\Models\Login;
+use App\Models\School;
 use App\Models\Referral;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -370,12 +371,15 @@ public function register(Request $request)
             'state' => $request->state,
             'password'  =>  'password',
             'admin_class_id' => $request->admin_class_id,
-            'school_id'=> $request->school_id,
-            'assoc_cat_id' => 1
+            'school_id'=> $request->school_id
         ]);
 
-        $user->refresh();
-        $user->student_code = ($admin->chapter_code ?? 'IKJ') . '/0' . ($admin->school_id ?? '14') . '/0' . ($user->id ?? '1');
+        $school = School::find($user->school_id);
+        $local_govt = $school->local_govt ?? 'IKJ';  
+
+        // Generate student code
+        $user->student_code = substr($local_govt, 0, 3) . '/0' . ($user->school_id ?? '14') . '/0' . ($user->id ?? '1');
+
         $user->save();
 
         if($user){
