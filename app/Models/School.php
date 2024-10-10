@@ -9,7 +9,7 @@ class School extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['school_name', 'assoc_category_id'];
+    protected $fillable = ['school_name', 'district_id' ];
 
     protected $table = 'schools';
 }
