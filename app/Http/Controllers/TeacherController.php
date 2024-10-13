@@ -366,8 +366,7 @@ class TeacherController extends Controller
         $user = auth()->user();
 
         if ($user && $user->school_id !== null) {
-            $totalUsers = DB::table('users')
-            ->where('assoc_cat_id', 1)           
+            $totalUsers = DB::table('users')    
             ->where('users.school_id', $user->school_id)
             ->count();
     

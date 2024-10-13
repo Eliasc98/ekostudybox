@@ -67,7 +67,7 @@ Route::delete('admin/referrals/{id}', [AdminReferralController::class, 'deleteRe
 Route::post('admin/trial/activate', [TrialController::class, 'activateTrial']);
 Route::post('admin/trial/auto-deduct', [TrialController::class, 'autoDeduct']);
 
-Route::get('auth/fetch-school-by-district', [EkostudyAdminController::class, 'getSchoolsByDistrict']);
+Route::get('auth/fetch-school-by-district/{district_id}', [EkostudyAdminController::class, 'getSchoolsByDistrict']);
 
 
 
@@ -152,6 +152,14 @@ Route::post('auth/admin/login', [AdminAuthController::class, 'login']);
 // });
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    ///eko-study
+
+    Route::get('eko-study/get-general-summary', [EkostudyAdminController::class, 'getGeneralAdminSummary']); //state dashboard table
+    Route::get('eko-study/get-admin-table', [EkostudyAdminController::class, 'districtTestResults']); //general admin table
+    Route::get('eko-study/get-admin-table/{district_id}', [EkostudyAdminController::class, 'getDistrictSummary']); //district summary table
+    Route::get('eko-study/get-admin-table/{school_id}', [EkostudyAdminController::class, 'getSchoolSummary']); //school summary table
+
 
     Route::get('assoc-management-cat/test-checker/{test_taken_id}', [TeacherController::class, 'checkIfTestTaken']);
     /////////// NAPPS ENDPOINTS///////

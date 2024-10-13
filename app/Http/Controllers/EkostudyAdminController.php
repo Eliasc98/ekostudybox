@@ -27,51 +27,85 @@ class EkostudyAdminController extends Controller
 
     ////<<<<<<<<<<<<<<<<<<<< General Dashboard Analytics >>>>>>>>>>>>>>>>>>
 
-    public function totalTestTaken()
+    // public function totalTestTaken()
+    // {
+
+    //     $totalTestsByCategory = DB::table('assessment_take_tests')
+    //     ->join('subjects', 'assessment_take_tests.subject_id', '=', 'subjects.id')
+    //     ->count();
+
+    //     if ($totalTestsByCategory !== null) {
+
+    //         $response = [
+    //             'status' => 'success',
+    //             'message' => 'Total tests by category fetched successfully',
+    //             'data' => $totalTestsByCategory ?? 0
+    //         ];
+
+    //         return response()->json($response);
+
+    //     } else {
+
+    //         $response = [
+    //             'status' => 'failed',
+    //             'message' => 'Unable to fetch total tests by category'
+    //         ];
+
+    //         return response()->json($response);
+    //     }
+    // }
+
+    // public function totalStudents(){
+
+    //     $totalStudents = User::count();       
+
+    //     $response = [
+    //         'status' => 'success',
+    //         'message' => 'Total tests by category fetched successfully',
+    //         'data' => $totalTestsByCategory ?? 0
+    //     ];
+
+    //     return response()->json($response);
+        
+    // }
+
+    public function getGeneralAdminSummary()
     {
+        try {
+            // Fetch total districts, total students, and total tests taken
+            $result = DB::table('districts')
+                ->leftJoin('schools', 'districts.id', '=', 'schools.district_id')
+                ->leftJoin('users', 'schools.id', '=', 'users.school_id')
+                ->leftJoin('assessment_test_takens', 'users.id', '=', 'assessment_test_takens.user_id')
+                ->select(
+                    DB::raw('COUNT(DISTINCT districts.id) as total_districts'),
+                    DB::raw('COUNT(DISTINCT users.id) as total_students'),
+                    DB::raw('COUNT(assessment_test_takens.id) as total_tests_taken')
+                )
+                ->first();
 
-        $totalTestsByCategory = DB::table('assessment_take_tests')
-        ->join('subjects', 'assessment_take_tests.subject_id', '=', 'subjects.id')
-        ->count();
-
-        if ($totalTestsByCategory !== null) {
-
-            $response = [
-                'status' => 'success',
-                'message' => 'Total tests by category fetched successfully',
-                'data' => $totalTestsByCategory ?? 0
-            ];
-
-            return response()->json($response);
-
-        } else {
-
-            $response = [
+            // Check if the data exists
+            if ($result) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'General admin summary fetched successfully',
+                    'data' => $result
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'No data found'
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
                 'status' => 'failed',
-                'message' => 'Unable to fetch total tests by category'
-            ];
-
-            return response()->json($response);
+                'message' => 'An error occurred: ' . $e->getMessage()
+            ]);
         }
     }
 
-    public function totalStudents(){
 
-        $totalStudents = User::count();       
-
-        $response = [
-            'status' => 'success',
-            'message' => 'Total tests by category fetched successfully',
-            'data' => $totalTestsByCategory ?? 0
-        ];
-
-        return response()->json($response);
-        
-    }
-
-    public function generalTable(){
-
-    }
 
 /////// Total test taken in categories(One endpoint to return total test taken in each categories[SSCE, BECE, UTME])
 
@@ -206,7 +240,9 @@ public function testTakenListWithStudentInfo(){
 {
     try {
         // Get the authenticated user
-        $user = auth()->user();
+        // $user = auth()->user();
+        $user->role = 3;
+
 
         if (!$user) {
             return response()->json([
@@ -216,7 +252,7 @@ public function testTakenListWithStudentInfo(){
         }
 
         // Check the role of the user to determine the data to fetch
-        if ($user->role == 3) { // Admin can view results for all districts
+        if ($user->role === 3) { // Admin can view results for all districts
             $results = DB::table('districts')
                 ->join('schools', 'districts.id', '=', 'schools.district_id')
                 ->join('admins', 'schools.id', '=', 'admins.school_id')
@@ -232,7 +268,7 @@ public function testTakenListWithStudentInfo(){
                 ->groupBy('districts.name')
                 ->get();
 
-        } elseif ($user->role == 2) { // District Admin can view results only for their district
+        } elseif ($user->role === 2) {
             $results = DB::table('districts')
                 ->join('schools', 'districts.id', '=', 'schools.district_id')
                 ->join('admins', 'schools.id', '=', 'admins.school_id')
@@ -249,7 +285,7 @@ public function testTakenListWithStudentInfo(){
                 ->groupBy('districts.name')
                 ->get();
 
-        } elseif ($user->role == 1) { // School Admin can view results for their school’s district
+        } elseif ($user->role === 1) { // School Admin can view results for their school’s district
             $results = DB::table('districts')
                 ->join('schools', 'districts.id', '=', 'schools.district_id')
                 ->join('admins', 'schools.id', '=', 'admins.school_id')
@@ -417,6 +453,114 @@ public function getSchoolsByDistrict($district_id)
             'message' => 'Schools fetched successfully',
             'data' => $schools
         ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'An error occurred: ' . $e->getMessage()
+        ]);
+    }
+}
+
+
+public function getDistrictSubjectAverageScores($district_id)
+{
+    try {
+        // Check if the district exists
+        $district = DB::table('districts')->where('id', $district_id)->first();
+        if (!$district) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'District not found'
+            ]);
+        }
+
+        // Define the subjects we want to calculate averages for
+        $subjects = ['Mathematics', 'English', 'Biology', 'Chemistry', 'Physics', 'Commerce', 'Accounting', 'Government', 'Lit-in-Eng', 'Agricultural Science'];
+
+        // Fetch the average percentage score for each subject in the district
+        $averageScores = DB::table('user_assessment_scores')
+            ->join('assessment_test_takens', 'user_assessment_scores.assessment_test_taken_id', '=', 'assessment_test_takens.id')
+            ->join('users', 'assessment_test_takens.user_id', '=', 'users.id')
+            ->join('subjects', 'assessment_test_takens.subject_id', '=', 'subjects.id')
+            ->join('schools', 'users.school_id', '=', 'schools.id')
+            ->where('schools.district_id', $district_id)
+            ->whereIn('subjects.subject_name', $subjects)
+            ->select(
+                'subjects.subject_name',
+                DB::raw('AVG(user_assessment_scores.score) AS average_score'),
+                DB::raw('(AVG(user_assessment_scores.score) / 100) * 100 as average_score_percentage')
+            )
+            ->groupBy('subjects.subject_name')
+            ->get();
+
+        // Check if scores are found
+        if ($averageScores->isEmpty()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No score data found for this district'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Average scores fetched successfully for the district',
+            'data' => $averageScores
+        ]);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'An error occurred: ' . $e->getMessage()
+        ]);
+    }
+}
+
+
+public function getSchoolSubjectAverageScores($school_id)
+{
+    try {
+        // Check if the school exists
+        $school = DB::table('schools')->where('id', $school_id)->first();
+        if (!$school) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'School not found'
+            ]);
+        }
+
+        // Define the subjects we want to calculate averages for
+        $subjects = ['Mathematics', 'English', 'Biology', 'Chemistry', 'Physics', 'Commerce', 'Accounting', 'Government', 'Lit-in-Eng', 'Agricultural Science'];
+
+        // Fetch the average percentage score for each subject in the school
+        $averageScores = DB::table('user_assessment_scores')
+            ->join('assessment_test_takens', 'user_assessment_scores.assessment_test_taken_id', '=', 'assessment_test_takens.id')
+            ->join('users', 'assessment_test_takens.user_id', '=', 'users.id')
+            ->join('subjects', 'assessment_test_takens.subject_id', '=', 'subjects.id')
+            ->where('users.school_id', $school_id)
+            ->whereIn('subjects.subject_name', $subjects)
+            ->select(
+                'subjects.subject_name',
+                DB::raw('AVG(user_assessment_scores.score) AS average_score'),
+                DB::raw('(AVG(user_assessment_scores.score) / 100) * 100 as average_score_percentage')
+            )
+            ->groupBy('subjects.subject_name')
+            ->get();
+
+        // Check if scores are found
+        if ($averageScores->isEmpty()) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No score data found for this school'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Average scores fetched successfully for the school',
+            'data' => $averageScores
+        ]);
+
     } catch (Exception $e) {
         return response()->json([
             'status' => 'failed',

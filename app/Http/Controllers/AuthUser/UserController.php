@@ -12,6 +12,7 @@ use App\Models\PointsHistory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth; 
 
 class UserController extends Controller
 {
@@ -559,7 +560,7 @@ public function login(Request $request)
     $login->email = $request->student_code ?? 'no-data';
     $login->save();
 
-    // return $this->onSuccessfulLogin($user);
+    return $this->onSuccessfulLogin($user);
 
     if ($log) {
         $student = User::where('student_code', $request->student_code)->first();
