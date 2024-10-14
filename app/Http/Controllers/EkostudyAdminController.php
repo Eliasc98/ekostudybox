@@ -87,6 +87,24 @@ class EkostudyAdminController extends Controller
         }
     }
 
+    public function fetchDistrictAdmin(){
+        $data = Admin::where('role', 2)->get();
+
+        // Check if the data exists
+        if ($data->isNotEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'District Admins fetched successfully',
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No data found'
+            ]);
+        }
+    }
+
     public function getGeneralAdminSummary()
     {
         try {
