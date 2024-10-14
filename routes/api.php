@@ -157,6 +157,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     ///eko-study
 
+    Route::get('eko-study/get-district-admin', [EkostudyAdminController::class, 'fetchDistrictAdmin']);
+
+    Route::get('eko-study/get-school-admin', [EkostudyAdminController::class, 'fetchSchoolAdmin']);
+
     Route::get('eko-study/get-general-summary', [EkostudyAdminController::class, 'getGeneralAdminSummary']); //state dashboard table
     
     Route::get('eko-study/get-admin-table', [EkostudyAdminController::class, 'districtTestResults']); //general admin table
