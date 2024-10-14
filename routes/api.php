@@ -151,14 +151,32 @@ Route::post('auth/admin/login', [AdminAuthController::class, 'login']);
 
 // });
 
+
+
 Route::middleware('auth:sanctum')->group(function () {
 
     ///eko-study
 
     Route::get('eko-study/get-general-summary', [EkostudyAdminController::class, 'getGeneralAdminSummary']); //state dashboard table
+    
     Route::get('eko-study/get-admin-table', [EkostudyAdminController::class, 'districtTestResults']); //general admin table
-    Route::get('eko-study/get-admin-table/{district_id}', [EkostudyAdminController::class, 'getDistrictSummary']); //district summary table
-    Route::get('eko-study/get-admin-table/{school_id}', [EkostudyAdminController::class, 'getSchoolSummary']); //school summary table
+    
+    Route::get('eko-study/get-district-admin-board/{district_id}', [EkostudyAdminController::class, 'getDistrictSummary']); //district summary table
+    
+    Route::get('eko-study/get-school-admin-board/{school_id}', [EkostudyAdminController::class, 'getSchoolSummary']); //school summary table
+    
+    Route::get('eko-study/district-chart/{district_id}', [EkostudyAdminController::class, 'getDistrictAverageScoreByCategory']); //district chart
+    
+    Route::get('eko-study/school-chart/{school_id}', [EkostudyAdminController::class, 'getSchoolAverageScoreByCategory']); //district chart
+    
+    
+    Route::get('eko-study/get-school-table-data/{school_id}', [EkostudyAdminController::class, 'getSubjectsTestInfoBySchool']); //district chart
+    
+    Route::get('eko-study/get-district-table-data/{district_id}', [EkostudyAdminController::class, 'getSchoolsInDistrictWithTestInfo']); //district chart
+    
+    
+    
+    
 
 
     Route::get('assoc-management-cat/test-checker/{test_taken_id}', [TeacherController::class, 'checkIfTestTaken']);

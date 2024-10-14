@@ -13,13 +13,13 @@ class AdminAuthController extends Controller
 {
     public function register(Request $request)
     {
-        $data = $request->validate([
+         $data = $request->validate([
             'fullname' => 'required',
             'school_id' => 'nullable',
             'state' => 'required',
-            'district' => 'required',
+            'district_id' => 'required',
             'role' => 'nullable',
-            'username' => 'required|unique:admins,username',
+            'username' => 'nullable',
             'email' => 'required|email|unique:admins,email',
             'password'  =>  ['required', 'string'],
             'password_confirmation'  =>  'required|string'
@@ -41,6 +41,7 @@ class AdminAuthController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Username already taken!'], 400);
         }
 
+        $data['username'] = $data['username'] ?? 'null';
         $data['password'] = Hash::make($request->password); 
 
         if (!$user = Admin::create($data)) {
