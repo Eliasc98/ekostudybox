@@ -74,7 +74,7 @@ class EkostudyAdminController extends Controller
          ->join('schools', 'admins.school_id', '=', 'schools.id') 
          ->select(
              'admins.*', 
-             'schools.name as school_name', 
+             'schools.school_name as school_name', 
              'schools.phone as phone_number'
          )
          ->get();
