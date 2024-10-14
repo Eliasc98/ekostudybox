@@ -69,6 +69,24 @@ class EkostudyAdminController extends Controller
         
     // }
 
+    public function fetchSchoolAdmin(){
+        $data = Admin::where('role', '1')->get();
+
+        // Check if the data exists
+        if ($data->isNotEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'School Admins fetched successfully',
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No data found'
+            ]);
+        }
+    }
+
     public function getGeneralAdminSummary()
     {
         try {
