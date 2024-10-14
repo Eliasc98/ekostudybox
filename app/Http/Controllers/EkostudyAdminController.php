@@ -69,41 +69,55 @@ class EkostudyAdminController extends Controller
         
     // }
 
-    public function fetchSchoolAdmin(){
-        $data = Admin::where('role', 1)->get();
-
-        // Check if the data exists
-        if ($data->isNotEmpty()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'School Admins fetched successfully',
-                'data' => $data
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'No data found'
-            ]);
-        }
-    }
-
-    public function fetchDistrictAdmin(){
-        $data = Admin::where('role', 2)->get();
-
-        // Check if the data exists
-        if ($data->isNotEmpty()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'District Admins fetched successfully',
-                'data' => $data
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'No data found'
-            ]);
-        }
-    }
+     public function fetchSchoolAdmin(){
+        $data = Admin::where('role', '1') 
+         ->join('schools', 'admins.school_id', '=', 'schools.id') 
+         ->select(
+             'admins.*', 
+             'schools.name as school_name', 
+             'schools.phone as phone_number'
+         )
+         ->get();
+ 
+         // Check if the data exists
+         if ($data->isNotEmpty()) {
+             return response()->json([
+                 'status' => 'success',
+                 'message' => 'School Admins fetched successfully',
+                 'data' => $data
+             ]);
+         } else {
+             return response()->json([
+                 'status' => 'failed',
+                 'message' => 'No data found'
+             ]);
+         }
+     }
+ 
+     public function fetchDistrictAdmin(){
+         $data = Admin::where('role', '2')
+         ->join('districts', 'admins.district_id', '=', 'districts.id') 
+         ->select(
+             'admins.*', 
+             'districts.name as district_name', 
+             'districts.state as district_state'
+         )
+         ->get();
+ 
+         // Check if the data exists
+         if ($data->isNotEmpty()) {
+             return response()->json([
+                 'status' => 'success',
+                 'message' => 'District Admins fetched successfully',
+                 'data' => $data
+             ]);
+         } else {
+             return response()->json([
+                 'status' => 'failed',
+                 'message' => 'No data found'
+             ]);
+         }
+     }
 
     public function getGeneralAdminSummary()
     {
