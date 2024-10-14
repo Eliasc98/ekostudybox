@@ -70,7 +70,7 @@ class EkostudyAdminController extends Controller
     // }
 
     public function fetchSchoolAdmin(){
-        $data = Admin::where('role', '1')->get();
+        $data = Admin::where('role', 1)->get();
 
         // Check if the data exists
         if ($data->isNotEmpty()) {
