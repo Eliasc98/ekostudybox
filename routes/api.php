@@ -156,8 +156,21 @@ Route::post('auth/admin/login', [AdminAuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
 
     ///eko-study
-
-    Route::get('eko-study/get-district-admin', [EkostudyAdminController::class, 'fetchDistrictAdmin']);
+    
+    ///study module
+    
+    Route::get('admin/reports/school-performance/{school_id}', [EkostudyAdminController::class, 'getSchoolPerformance']);
+    
+    Route::get('admin/reports/progress-performance-by-district/{district_id}', [EkostudyAdminController::class, 'getProgressByDistrictWithSubjects']);
+    
+    Route::get('admin/reports/progress-performance-by-school/{school_id}', [EkostudyAdminController::class, 'getProgressBySchoolWithSubjects']);
+    
+    Route::get('admin/reports/progress-performance-by-class/{class_id}', [EkostudyAdminController::class, 'getProgressByClassWithSubjects']);
+    
+    
+    ///end of study module
+    
+     Route::get('eko-study/get-district-admin', [EkostudyAdminController::class, 'fetchDistrictAdmin']);
 
     Route::get('eko-study/get-school-admin', [EkostudyAdminController::class, 'fetchSchoolAdmin']);
 
