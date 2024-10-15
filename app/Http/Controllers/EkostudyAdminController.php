@@ -68,56 +68,56 @@ class EkostudyAdminController extends Controller
     //     return response()->json($response);
         
     // }
+    
+    public function fetchSchoolAdmin(){
+       $data = Admin::where('role', '1') 
+        ->join('schools', 'admins.school_id', '=', 'schools.id') 
+        ->select(
+            'admins.*', 
+            'schools.school_name as school_name', 
+            'schools.phone as phone_number'
+        )
+        ->get();
 
-     public function fetchSchoolAdmin(){
-        $data = Admin::where('role', '1') 
-         ->join('schools', 'admins.school_id', '=', 'schools.id') 
-         ->select(
-             'admins.*', 
-             'schools.school_name as school_name', 
-             'schools.phone as phone_number'
-         )
-         ->get();
- 
-         // Check if the data exists
-         if ($data->isNotEmpty()) {
-             return response()->json([
-                 'status' => 'success',
-                 'message' => 'School Admins fetched successfully',
-                 'data' => $data
-             ]);
-         } else {
-             return response()->json([
-                 'status' => 'failed',
-                 'message' => 'No data found'
-             ]);
-         }
-     }
- 
-     public function fetchDistrictAdmin(){
-         $data = Admin::where('role', '2')
-         ->join('districts', 'admins.district_id', '=', 'districts.id') 
-         ->select(
-             'admins.*', 
-             'districts.name as district_name', 
-             'districts.state as district_state'
-         )
-         ->get();
- 
-         // Check if the data exists
-         if ($data->isNotEmpty()) {
-             return response()->json([
-                 'status' => 'success',
-                 'message' => 'District Admins fetched successfully',
-                 'data' => $data
-             ]);
-         } else {
-             return response()->json([
-                 'status' => 'failed',
-                 'message' => 'No data found'
-             ]);
-         }
-     }
+        // Check if the data exists
+        if ($data->isNotEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'School Admins fetched successfully',
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No data found'
+            ]);
+        }
+    }
+
+    public function fetchDistrictAdmin(){
+        $data = Admin::where('role', '2')
+        ->join('districts', 'admins.district_id', '=', 'districts.id') 
+        ->select(
+            'admins.*', 
+            'districts.name as district_name', 
+            'districts.state as district_state'
+        )
+        ->get();
+
+        // Check if the data exists
+        if ($data->isNotEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'District Admins fetched successfully',
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No data found'
+            ]);
+        }
+    }
 
     public function getGeneralAdminSummary()
     {
@@ -154,6 +154,181 @@ class EkostudyAdminController extends Controller
             ]);
         }
     }
+    
+    
+    ///// Study module
+    
+    // Routes in routes/api.php or routes/web.php
+
+
+// Controller Method in AdminReportController.php
+    public function getSchoolPerformance($school_id)
+    {
+                $report = DB::table('marking_result_scores')
+                    ->join('user_study_marking', 'marking_result_scores.user_study_marking_id', '=', 'user_study_marking.id')
+                    ->join('users', 'user_study_marking.user_id', '=', 'users.id')
+                    ->join('schools', 'users.school_id', '=', 'schools.id')
+                    ->select(
+                        'schools.name as school_name',
+                        DB::raw('COUNT(marking_result_scores.id) as total_tests_taken'),
+                        DB::raw('AVG(marking_result_scores.score) as average_score'),
+                        DB::raw('AVG(marking_result_scores.score / 100) * 100 as score_percentage')
+                    )
+                    ->where('schools.id', $schoolId)
+                    ->groupBy('schools.school_name')
+                    ->get();
+    
+                if ($report) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'school performance fetched successfully',
+                        'data' => $report
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'failed',
+                        'message' => 'No data found'
+                    ]);
+                }
+    }
+    
+    public function getProgressByDistrictWithSubjects($district_id)
+{
+    try {
+
+        $query = DB::table('user_topic_progress')
+            ->join('users', 'user_topic_progress.user_id', '=', 'users.id')
+            ->join('schools', 'users.school_id', '=', 'schools.id')
+            ->join('districts', 'schools.district_id', '=', 'districts.id')
+            ->join('admin_classes', 'users.class_id', '=', 'admin_classes.id')
+            ->join('admin_subjects', 'user_topic_progress.subject_id', '=', 'admin_subjects.id')
+            ->select(
+                'districts.name as district_name',
+                'admin_subjects.subject_name as subject_name',
+                DB::raw('COUNT(user_topic_progress.id) as total_topics_completed'),
+                DB::raw('AVG(user_topic_progress.progress) as average_progress')
+            )
+            ->groupBy('districts.name', 'admin_subjects.subject_name');
+
+        // Apply district filter
+        if ($districtId) {
+            $query->where('districts.id', $districtId);
+        }
+
+        $report = $query->get();
+
+        if ($report) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'progress by district per subject fetched successfully',
+                        'data' => $report
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'failed',
+                        'message' => 'No data found'
+                    ]);
+                }
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Unable to generate progress overview by district with subjects.',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function getProgressBySchoolWithSubjects($school_id)
+{
+    try {
+        // $schoolId = $request->input('school_id');
+
+        $query = DB::table('user_topic_progress')
+            ->join('users', 'user_topic_progress.user_id', '=', 'users.id')
+            ->join('schools', 'users.school_id', '=', 'schools.id')
+            ->join('admin_classes', 'users.class_id', '=', 'admin_classes.id')
+            ->join('admin_subjects', 'user_topic_progress.subject_id', '=', 'admin_subjects.id')
+            ->select(
+                'schools.school_name as school_name',
+                'admin_subjects.subject_name as subject_name',
+                DB::raw('COUNT(user_topic_progress.id) as total_topics_completed'),
+                DB::raw('AVG(user_topic_progress.progress) as average_progress')
+            )
+            ->groupBy('schools.school_name', 'admin_subjects.subject_name');
+
+        // Apply school filter
+        if ($schoolId) {
+            $query->where('schools.id', $schoolId);
+        }
+
+        $report = $query->get();
+
+        if ($report) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'school performance fetched successfully',
+                        'data' => $report
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'failed',
+                        'message' => 'No data found'
+                    ]);
+                }
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Unable to generate progress overview by school with subjects.',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function getProgressByClassWithSubjects($class_id)
+{
+    try {
+        // $classId = $request->input('class_id');
+
+        $query = DB::table('user_topic_progress')
+            ->join('users', 'user_topic_progress.user_id', '=', 'users.id')
+            ->join('admin_classes', 'users.admin_class_id', '=', 'admin_classes.id')
+            ->join('admin_subjects', 'user_topic_progress.subject_id', '=', 'admin_subjects.id')
+            ->select(
+                'admin_classes.class_name as class_name',
+                'admin_subjects.subject_name as subject_name',
+                DB::raw('COUNT(user_topic_progress.id) as total_topics_completed'),
+                DB::raw('AVG(user_topic_progress.progress) as average_progress')
+            )
+            ->groupBy('admin_classes.class_name', 'admin_subjects.subject_name');
+
+        // Apply class filter
+        if ($classId) {
+            $query->where('admin_classes.id', $classId);
+        }
+
+        $report = $query->get();
+
+        if ($report) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'progress by class fetched successfully',
+                'data' => $report
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'No data found'
+            ]);
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Unable to generate progress overview by class with subjects.',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+
+
+
 
 
 
