@@ -162,35 +162,35 @@ class EkostudyAdminController extends Controller
 
 
 // Controller Method in AdminReportController.php
-    public function getSchoolPerformance($school_id)
-    {
-                $report = DB::table('marking_result_scores')
-                    ->join('user_study_marking', 'marking_result_scores.user_study_marking_id', '=', 'user_study_marking.id')
-                    ->join('users', 'user_study_marking.user_id', '=', 'users.id')
-                    ->join('schools', 'users.school_id', '=', 'schools.id')
-                    ->select(
-                        'schools.name as school_name',
-                        DB::raw('COUNT(marking_result_scores.id) as total_tests_taken'),
-                        DB::raw('AVG(marking_result_scores.score) as average_score'),
-                        DB::raw('AVG(marking_result_scores.score / 100) * 100 as score_percentage')
-                    )
-                    ->where('schools.id', $schoolId)
-                    ->groupBy('schools.school_name')
-                    ->get();
-    
-                if ($report) {
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'school performance fetched successfully',
-                        'data' => $report
-                    ]);
-                } else {
-                    return response()->json([
-                        'status' => 'failed',
-                        'message' => 'No data found'
-                    ]);
-                }
-    }
+public function getSchoolPerformance($school_id)
+{
+            $report = DB::table('marking_result_scores')
+                ->join('user_study_marking', 'marking_result_scores.user_study_marking_id', '=', 'user_study_marking.id')
+                ->join('users', 'user_study_marking.user_id', '=', 'users.id')
+                ->join('schools', 'users.school_id', '=', 'schools.id')
+                ->select(
+                    'schools.name as school_name',
+                    DB::raw('COUNT(marking_result_scores.id) as total_tests_taken'),
+                    DB::raw('AVG(marking_result_scores.score) as average_score'),
+                    DB::raw('AVG(marking_result_scores.score / 100) * 100 as score_percentage')
+                )
+                ->where('schools.id', $schoolId)
+                ->groupBy('schools.school_name')
+                ->get();
+
+            if ($report) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'school performance fetched successfully',
+                    'data' => $report
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'No data found'
+                ]);
+            }
+}
     
     public function getProgressByDistrictWithSubjects($district_id)
 {
@@ -200,7 +200,7 @@ class EkostudyAdminController extends Controller
             ->join('users', 'user_topic_progress.user_id', '=', 'users.id')
             ->join('schools', 'users.school_id', '=', 'schools.id')
             ->join('districts', 'schools.district_id', '=', 'districts.id')
-            ->join('admin_classes', 'users.class_id', '=', 'admin_classes.id')
+            ->join('admin_classes', 'users.admin_class_id', '=', 'admin_classes.id')
             ->join('admin_subjects', 'user_topic_progress.subject_id', '=', 'admin_subjects.id')
             ->select(
                 'districts.name as district_name',
@@ -240,8 +240,7 @@ class EkostudyAdminController extends Controller
 public function getProgressBySchoolWithSubjects($school_id)
 {
     try {
-        // $schoolId = $request->input('school_id');
-
+        
         $query = DB::table('user_topic_progress')
             ->join('users', 'user_topic_progress.user_id', '=', 'users.id')
             ->join('schools', 'users.school_id', '=', 'schools.id')
@@ -324,6 +323,10 @@ public function getProgressByClassWithSubjects($class_id)
             'message' => $e->getMessage(),
         ], 500);
     }
+}
+
+public function getPerformanceForAllSchoolInDistrict($district_id){
+    //
 }
 
 
@@ -504,7 +507,7 @@ public function getSchoolAverageScoreByCategory($school_id)
 
 
 
-//////// GET TSTS ENDPOINTS
+    //////// GET TSTS ENDPOINTS
  //>>>>>.i need endpoint that use test id to fetch all the student results in a particuular test>>>>>>>
 
  public function testStudentResults($test_id)
