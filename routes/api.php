@@ -580,8 +580,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/save-chats/{message}/{response}', [MobileController::class, 'addChat']);
     Route::post('user/save-chats-user', [MobileController::class, 'addChatPost']);
 
-
-
 });
 
 Route::get('user/inserttestype-record', [MobileController::class, 'createTestType']);
