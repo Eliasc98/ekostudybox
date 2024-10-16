@@ -147,10 +147,6 @@ Route::post('get-download-click', [DownloadController::class, 'store']); //route
 Route::post('auth/admin/register', [AdminAuthController::class, 'register']);
 Route::post('auth/admin/login', [AdminAuthController::class, 'login']);
 
-// Route::middleware(['auth:admin'])->group(['prefix' => 'admin'],function () {
-
-// });
-
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -158,6 +154,14 @@ Route::middleware('auth:sanctum')->group(function () {
     ///eko-study
     
     ///study module
+    
+    Route::get('admin/reports/get-overall-performance', [EkostudyAdminController::class, 'getOverallPerformance']);
+    
+    Route::get('admin/reports/get-study-districts-summary', [EkostudyAdminController::class, 'getStudyDistrictSummary']);
+    
+    Route::get('admin/reports/get-study-school-summary/{school_id}', [EkostudyAdminController::class, 'getStudySchoolSummary']);
+    
+    Route::get('admin/reports/get-study-district-summary/{district_id}', [EkostudyAdminController::class, 'getStudyDistrictSummary']);
     
     Route::get('admin/reports/school-performance/{school_id}', [EkostudyAdminController::class, 'getSchoolPerformance']);
     
@@ -167,9 +171,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('admin/reports/progress-performance-by-class/{class_id}', [EkostudyAdminController::class, 'getProgressByClassWithSubjects']);
     
-    
-    ///end of study module
-    
+    //end of study
+     
      Route::get('eko-study/get-district-admin', [EkostudyAdminController::class, 'fetchDistrictAdmin']);
 
     Route::get('eko-study/get-school-admin', [EkostudyAdminController::class, 'fetchSchoolAdmin']);
@@ -579,6 +582,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('user/fetch-user-chats', [MobileController::class, 'fetchUserChats']);
     Route::get('user/save-chats/{message}/{response}', [MobileController::class, 'addChat']);
     Route::post('user/save-chats-user', [MobileController::class, 'addChatPost']);
+
+
 
 });
 
