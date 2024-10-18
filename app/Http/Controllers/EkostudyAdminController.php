@@ -476,7 +476,7 @@ public function getTopStudyStudents()
             ->leftJoin('marking_result_scores', 'users.id', '=', 'marking_result_scores.user_study_marking_id')
             ->select(
                 'schools.id as school_id',
-                'schools.name as school_name',
+                'schools.school_name as school_name',
                 DB::raw('COUNT(DISTINCT user_topic_progress.id) as total_topics_read'),
                 DB::raw('COUNT(DISTINCT marking_result_scores.id) as total_marked_tests'),
                 DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score')
