@@ -155,13 +155,22 @@ Route::middleware('auth:sanctum')->group(function () {
     
     ///study module
     
+    Route::get('admin/reports/get-top-schools-in-district/{district_id}', [EkostudyAdminController::class, 'getTopSchoolsInDistrict']);
+    Route::get('admin/reports/get-students-summary-study-by-school/{school_id}', [EkostudyAdminController::class, 'getStudentsSummaryBySchool']);
+    
+    Route::get('admin/reports/get-students-summary-assessment-by-school/{school_id}', [EkostudyAdminController::class, 'getAssessmentSummaryBySchool']);
+    
+    Route::get('admin/reports/get-top-students-study', [EkostudyAdminController::class, 'getTopStudyStudents']);
+    
+    Route::get('admin/reports/get-top-students-assessments', [EkostudyAdminController::class, 'getAssessmentTopStudents']);
+    
     Route::get('admin/reports/get-overall-performance', [EkostudyAdminController::class, 'getOverallPerformance']);
     
     Route::get('admin/reports/get-study-districts-summary', [EkostudyAdminController::class, 'getStudyDistrictSummary']);
     
     Route::get('admin/reports/get-study-school-summary/{school_id}', [EkostudyAdminController::class, 'getStudySchoolSummary']);
     
-    Route::get('admin/reports/get-study-district-summary/{district_id}', [EkostudyAdminController::class, 'getStudyDistrictSummary']);
+    Route::get('admin/reports/get-study-district-summary/{district_id}', [EkostudyAdminController::class, 'getStudyDistrictTable']);
     
     Route::get('admin/reports/school-performance/{school_id}', [EkostudyAdminController::class, 'getSchoolPerformance']);
     
