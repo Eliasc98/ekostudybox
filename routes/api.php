@@ -147,8 +147,6 @@ Route::post('get-download-click', [DownloadController::class, 'store']); //route
 Route::post('auth/admin/register', [AdminAuthController::class, 'register']);
 Route::post('auth/admin/login', [AdminAuthController::class, 'login']);
 
-
-
 Route::middleware('auth:sanctum')->group(function () {
 
     ///eko-study
@@ -156,9 +154,13 @@ Route::middleware('auth:sanctum')->group(function () {
     ///study module
     
     Route::get('admin/reports/get-top-schools-in-district/{district_id}', [EkostudyAdminController::class, 'getTopSchoolsInDistrict']);
-    Route::get('admin/reports/get-students-summary-study-by-school/{school_id}', [EkostudyAdminController::class, 'getStudentsSummaryBySchool']);
+    Route::get('admin/students/report/{school_id}/{class_id}', [EkostudyAdminController::class, 'getStudentReportByClass']);
+    
+
+Route::get('admin/reports/get-students-summary-study-by-school/{school_id}', [EkostudyAdminController::class, 'getStudentsSummaryBySchool']);
     
     Route::get('admin/reports/get-students-summary-assessment-by-school/{school_id}', [EkostudyAdminController::class, 'getAssessmentSummaryBySchool']);
+    
     
     Route::get('admin/reports/get-top-students-study', [EkostudyAdminController::class, 'getTopStudyStudents']);
     
