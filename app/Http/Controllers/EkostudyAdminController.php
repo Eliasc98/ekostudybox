@@ -68,7 +68,51 @@ class EkostudyAdminController extends Controller
     //     return response()->json($response);
         
     // }
-    
+    public function getStudentReportByClass($school_id, $class_id)
+{
+    try {
+
+        $query = DB::table('users')
+            ->leftJoin('user_topic_progress', 'users.id', '=', 'user_topic_progress.user_id')
+            ->leftJoin('marking_result_scores', 'users.id', '=', 'marking_result_scores.user_study_marking_id')
+            ->select(
+                'users.id as student_id',
+                'users.firstname',
+                'users.lastname',
+                DB::raw('COUNT(DISTINCT user_topic_progress.id) as total_topics_completed'),
+                DB::raw('COUNT(DISTINCT marking_result_scores.id) as total_tests_marked'),
+                DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score')
+            )
+            ->where('users.school_id', $school_id);
+
+       
+        if ($class_id) {
+            $query->where('users.admin_class_id', $class_id);
+        }
+
+        $report = $query->groupBy('users.id', 'users.firstname', 'users.lastname')->get();
+
+        if ($report->isEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'No data found for the selected class'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Student reports fetched successfully',
+            'data' => $report
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Unable to retrieve student reports',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
     public function getAssessmentTopStudents()///top 10 assessment scorers
 {
     try {
@@ -400,14 +444,22 @@ public function getTopStudyStudents()
                 ->where('users.school_id', $schoolId)
                 ->groupBy('users.id', 'users.firstname', 'users.lastname')
                 ->get();
+                
+                // Check if any data was found
+                if ($query->isEmpty()) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'No student found for the given school'
+                    ], 200);
+                }
     
             // Prepare the response data
             $responseData = $query->map(function ($item) {
                 return [
                     'student_id' => $item->student_id,
                     'fullname' => $item->firstname . ' ' . $item->lastname,
-                    'total_tests_taken' => (int) $item->total_tests_taken ?? 0,
-                    'average_score' => (float) $item->average_score ?? 0
+                    'total_tests_taken' => (int) $item->total_tests_taken,
+                    'average_score' => (float) $item->average_score
                 ];
             });
     
@@ -441,14 +493,22 @@ public function getTopStudyStudents()
                 ->where('users.school_id', $schoolId)
                 ->groupBy('users.id', 'users.firstname', 'users.lastname')
                 ->get();
+                
+                // Check if any data was found
+                if ($query->isEmpty()) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'No student found for the given school'
+                    ], 200);
+                }
     
             // Prepare the response data
             $responseData = $query->map(function ($item) {
                 return [
                     'student_id' => $item->student_id,
                     'fullname' => $item->firstname . ' ' . $item->lastname,
-                    'total_tests_taken' => (int) $item->total_tests_taken ?? 0,
-                    'average_score' => (float) $item->average_score ?? 0
+                    'total_tests_taken' => (int) $item->total_tests_taken,
+                    'average_score' => (float) $item->average_score
                 ];
             });
     
@@ -482,7 +542,7 @@ public function getTopStudyStudents()
                 DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score')
             )
             ->where('schools.district_id', $districtId) // Filter by district
-            ->groupBy('schools.id', 'schools.name')
+            ->groupBy('schools.id', 'schools.school_name')
             ->orderBy(DB::raw('AVG(marking_result_scores.score)'), 'desc') // Order by average score
             ->orderBy(DB::raw('COUNT(user_topic_progress.id)'), 'desc') // Secondary order by total topics read
             ->limit(10) // Limit to top 10 schools
