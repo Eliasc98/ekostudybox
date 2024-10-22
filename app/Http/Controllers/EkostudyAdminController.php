@@ -1434,14 +1434,14 @@ public function getSubjectsTestInfoBySchool($school_id)
  public function all_test_pass_rates()
  {
      $tests = DB::table('assessment_test_takens')
-         ->join('assessment_take_tests', 'assessment_test_takens.id', '=', 'assessment_take_tests.assessment_test_taken_id')
-         ->join('test_types', 'assessment_test_takens.test_type_id', '=', 'test_types.id')
-         ->join('users', 'assessment_test_takens.user_id', '=', 'users.id')
-         ->join('user_assessment_scores', 'assessment_test_takens.id', '=', 'user_assessment_scores.assessment_test_taken_id')
-         ->select('test_types.test_type_name', DB::raw('AVG(user_assessment_scores.score >= 50) * 100 as pass_rate'))
-         ->where('users.assoc_cat_id', 1) 
-         ->groupBy('test_types.test_type_name')
-         ->get();
+        ->join('assessment_take_tests', 'assessment_test_takens.id', '=', 'assessment_take_tests.assessment_test_taken_id')
+        ->join('test_types', 'assessment_test_takens.test_type_id', '=', 'test_types.id')
+        ->join('users', 'assessment_test_takens.user_id', '=', 'users.id')
+        ->join('user_assessment_scores', 'assessment_test_takens.id', '=', 'user_assessment_scores.assessment_test_taken_id')
+        ->select('test_types.test_type_name', DB::raw('AVG(user_assessment_scores.score >= 50) * 100 as pass_rate'))
+        ->where('users.assoc_cat_id', 1) 
+        ->groupBy('test_types.test_type_name')
+        ->get();
 
          if (!$tests->isEmpty()) {
 
