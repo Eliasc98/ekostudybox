@@ -193,15 +193,19 @@ public function getTopStudyStudents()
 
 
     
-    public function fetchSchoolAdmin(){
-       $data = Admin::where('role', '1') 
+    public function fetchSchoolAdmin($district_id){
+       $data = Admin::where('role', 1) 
+        ->where('admins.district_id', $district_id)
         ->join('schools', 'admins.school_id', '=', 'schools.id') 
         ->select(
             'admins.*', 
             'schools.school_name as school_name', 
             'schools.phone as phone_number'
         )
+        ->distinct() // Optional: add if you suspect duplicates
         ->get();
+
+
 
         // Check if the data exists
         if ($data->isNotEmpty()) {
@@ -1434,34 +1438,34 @@ public function getSubjectsTestInfoBySchool($school_id)
  public function all_test_pass_rates()
  {
      $tests = DB::table('assessment_test_takens')
-    ->join('assessment_take_tests', 'assessment_test_takens.id', '=', 'assessment_take_tests.assessment_test_taken_id')
-    ->join('test_types', 'assessment_test_takens.test_type_id', '=', 'test_types.id')
-    ->join('users', 'assessment_test_takens.user_id', '=', 'users.id')
-    ->join('user_assessment_scores', 'assessment_test_takens.id', '=', 'user_assessment_scores.assessment_test_taken_id')
-    ->select('test_types.test_type_name', DB::raw('AVG(user_assessment_scores.score >= 50) * 100 as pass_rate'))
-    ->where('users.assoc_cat_id', 1)
-    ->groupBy('test_types.test_type_name')
-    ->get();
+         ->join('assessment_take_tests', 'assessment_test_takens.id', '=', 'assessment_take_tests.assessment_test_taken_id')
+         ->join('test_types', 'assessment_test_takens.test_type_id', '=', 'test_types.id')
+         ->join('users', 'assessment_test_takens.user_id', '=', 'users.id')
+         ->join('user_assessment_scores', 'assessment_test_takens.id', '=', 'user_assessment_scores.assessment_test_taken_id')
+         ->select('test_types.test_type_name', DB::raw('AVG(user_assessment_scores.score >= 50) * 100 as pass_rate'))
+         ->where('users.assoc_cat_id', 1) 
+         ->groupBy('test_types.test_type_name')
+         ->get();
 
-    if (!$tests->isEmpty()) {
+         if (!$tests->isEmpty()) {
 
-        $response = [
-            'status' => 'success',
-            'message' => 'NAPPS test-pass-rate fetched successfully',
-            'tests' => $tests
-        ];
-
-        return response()->json($response);
-
-    } else {
-
-        $response = [
-            'status' => 'failed',
-            'message' => 'no tests-pass-rate fetched'
-        ];
-
-        return response()->json($response);
-    }
+             $response = [
+                 'status' => 'success',
+                 'message' => 'NAPPS test-pass-rate fetched successfully',
+                 'tests' => $tests
+             ];
+     
+             return response()->json($response);
+ 
+         } else {
+ 
+             $response = [
+                 'status' => 'failed',
+                 'message' => 'no tests-pass-rate fetched'
+             ];
+     
+             return response()->json($response);
+         }
  }
 
 }
