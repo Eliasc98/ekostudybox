@@ -434,53 +434,56 @@ class EkostudyAdminController extends Controller
     
     //// school study
     
-    public function getStudentsSummaryBySchool($schoolId)
-    {
-        try {
-            $query = DB::table('users')
-                ->leftJoin('marking_result_scores', 'users.id', '=', 'marking_result_scores.user_study_marking_id')
-                ->select(
-                    'users.id as student_id',
-                    'users.firstname',
-                    'users.lastname',
-                    DB::raw('IFNULL(COUNT(marking_result_scores.id), 0) as total_tests_taken'),
-                    DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score')
-                )
-                ->where('users.school_id', $schoolId)
-                ->groupBy('users.id', 'users.firstname', 'users.lastname')
-                ->get();
-                
-                // Check if any data was found
-                if ($query->isEmpty()) {
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'No student found for the given school'
-                    ], 200);
-                }
-    
-            // Prepare the response data
-            $responseData = $query->map(function ($item) {
-                return [
-                    'student_id' => $item->student_id,
-                    'fullname' => $item->firstname . ' ' . $item->lastname,
-                    'total_tests_taken' => (int) $item->total_tests_taken,
-                    'average_score' => (float) $item->average_score
-                ];
-            });
-    
+   public function getStudentsSummaryBySchool($schoolId)
+{
+    try {
+        $query = DB::table('users')
+            ->leftJoin('user_topic_progress', 'users.id', '=', 'user_topic_progress.user_id')
+                        ->leftJoin('user_study_markings', 'users.id', '=', 'user_study_markings.user_id')
+            ->leftJoin('marking_result_scores', 'user_study_markings.id', '=', 'marking_result_scores.user_study_marking_id')
+            ->select(
+                'users.id as student_id',
+                'users.firstname',
+                'users.lastname',
+                DB::raw('COUNT(DISTINCT user_topic_progress.id) as total_topics_completed'),
+                DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score') 
+            )
+            ->where('users.school_id', $schoolId)
+            ->groupBy('users.id', 'users.firstname', 'users.lastname')
+            ->get();
+
+        // Check if any data was found
+        if ($query->isEmpty()) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Student summary fetched successfully',
-                'data' => $responseData
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Unable to retrieve student summary.',
-                'message' => $e->getMessage(),
-            ], 500);
+                'message' => 'No student found for the given school'
+            ], 200);
         }
+
+        // Prepare the response data
+        $responseData = $query->map(function ($item) {
+            return [
+                'student_id' => $item->student_id,
+                'fullname' => $item->firstname . ' ' . $item->lastname,
+                'total_topics_completed' => (int) $item->total_topics_completed,
+                'average_score' => (float) $item->average_score
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Student summary fetched successfully',
+            'data' => $responseData
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Unable to retrieve student summary.',
+            'message' => $e->getMessage(),
+        ], 500);
     }
+}
+
 
     public function getAssessmentSummaryBySchool($schoolId)
     {
