@@ -80,7 +80,7 @@ class EkostudyAdminController extends Controller
                 'users.firstname',
                 'users.lastname',
                 DB::raw('COUNT(DISTINCT user_topic_progress.id) as total_topics_completed'),
-                DB::raw('COUNT(DISTINCT marking_result_scores.id) as total_tests_marked'),
+                DB::raw('COUNT(DISTINCT marking_result_scores.user_study_marking_id) as total_tests_marked'), 
                 DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score')
             )
             ->where('users.school_id', $school_id);
@@ -111,6 +111,7 @@ class EkostudyAdminController extends Controller
         ], 500);
     }
 }
+
 
 
     public function getAssessmentTopStudents()///top 10 assessment scorers
