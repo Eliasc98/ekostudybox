@@ -79,7 +79,7 @@ class EkostudyAdminController extends Controller
                 'users.id as student_id',
                 'users.firstname',
                 'users.lastname',
-                DB::raw('COUNT(DISTINCT user_topic_progress.id) as total_topics_completed'),
+                DB::raw('COUNT(DISTINCT user_topic_progress.id) as total_topics_completed'), 
                 DB::raw('COUNT(DISTINCT marking_result_scores.user_study_marking_id) as total_tests_marked'), 
                 DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score')
             )
@@ -89,6 +89,7 @@ class EkostudyAdminController extends Controller
             $query->where('users.admin_class_id', $class_id);
         }
 
+        
         $report = $query->groupBy('users.id', 'users.firstname', 'users.lastname')->get();
 
         if ($report->isEmpty()) {
@@ -112,85 +113,84 @@ class EkostudyAdminController extends Controller
     }
 }
 
-
-
+    
     public function getAssessmentTopStudents()///top 10 assessment scorers
-{
-    try {
-        // Query to calculate the top 10 students
-        $topStudents = DB::table('users')
-            ->leftJoin('assessment_test_takens', 'users.id', '=', 'assessment_test_takens.user_id')
-            ->leftJoin('user_assessment_scores', 'assessment_test_takens.id', '=', 'user_assessment_scores.assessment_test_taken_id')
-            ->select(
-                'users.id as user_id',
-                DB::raw("CONCAT(users.firstname, ' ', users.lastname) as student_name"),
-                DB::raw('COUNT(assessment_test_takens.id) as total_tests_taken'),
-                DB::raw('IFNULL(AVG(user_assessment_scores.score), 0) as average_score'),
-                DB::raw('((COUNT(assessment_test_takens.id) + IFNULL(AVG(user_assessment_scores.score), 0)) / 2) as performance_score')
-            )
-            ->groupBy('users.id', 'users.firstname', 'users.lastname')
-            ->orderBy('performance_score', 'DESC')
-            ->limit(10)  // Get the top 10 students
-            ->get();
-
-        if ($topStudents->isNotEmpty()) {
+    {
+        try {
+            // Query to calculate the top 10 students
+            $topStudents = DB::table('users')
+                ->leftJoin('assessment_test_takens', 'users.id', '=', 'assessment_test_takens.user_id')
+                ->leftJoin('user_assessment_scores', 'assessment_test_takens.id', '=', 'user_assessment_scores.assessment_test_taken_id')
+                ->select(
+                    'users.id as user_id',
+                    DB::raw("CONCAT(users.firstname, ' ', users.lastname) as student_name"),
+                    DB::raw('COUNT(assessment_test_takens.id) as total_tests_taken'),
+                    DB::raw('IFNULL(AVG(user_assessment_scores.score), 0) as average_score'),
+                    DB::raw('((COUNT(assessment_test_takens.id) + IFNULL(AVG(user_assessment_scores.score), 0)) / 2) as performance_score')
+                )
+                ->groupBy('users.id', 'users.firstname', 'users.lastname')
+                ->orderBy('performance_score', 'DESC')
+                ->limit(10)  // Get the top 10 students
+                ->get();
+    
+            if ($topStudents->isNotEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Assessment top scorer fetched successfully',
+                    'data' => $topStudents
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'No data found'
+                ]);
+            }
+        } catch (\Exception $e) {
             return response()->json([
-                'status' => 'success',
-                'message' => 'Assessment top scorer fetched successfully',
-                'data' => $topStudents
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'No data found'
-            ]);
+                'error' => 'Unable to retrieve top students.',
+                'message' => $e->getMessage(),
+            ], 500);
         }
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Unable to retrieve top students.',
-            'message' => $e->getMessage(),
-        ], 500);
     }
-}
-
-public function getTopStudyStudents()
-{
-    try {
-        // Query to calculate the top 10 students in the study module
-        $topStudents = DB::table('users')
-            ->leftJoin('user_topic_progress', 'users.id', '=', 'user_topic_progress.user_id')
-            ->leftJoin('marking_result_scores', 'users.id', '=', 'marking_result_scores.user_study_marking_id')
-            ->select(
-                'users.id as user_id',
-                DB::raw("CONCAT(users.firstname, ' ', users.lastname) as student_name"),
-                DB::raw('COUNT(user_topic_progress.id) as total_topics_completed'),
-                DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score'),
-                DB::raw('((COUNT(user_topic_progress.id) + IFNULL(AVG(marking_result_scores.score), 0)) / 2) as performance_score')
-            )
-            ->groupBy('users.id', 'users.firstname', 'users.lastname')
-            ->orderBy('performance_score', 'DESC')
-            ->limit(10)  // Get the top 10 students
-            ->get();
-
-        if ($topStudents->isNotEmpty()) {
+    
+    public function getTopStudyStudents()
+    {
+        try {
+            // Query to calculate the top 10 students in the study module
+            $topStudents = DB::table('users')
+                ->leftJoin('user_topic_progress', 'users.id', '=', 'user_topic_progress.user_id')
+                ->leftJoin('marking_result_scores', 'users.id', '=', 'marking_result_scores.user_study_marking_id')
+                ->select(
+                    'users.id as user_id',
+                    DB::raw("CONCAT(users.firstname, ' ', users.lastname) as student_name"),
+                    DB::raw('COUNT(user_topic_progress.id) as total_topics_completed'),
+                    DB::raw('IFNULL(AVG(marking_result_scores.score), 0) as average_score'),
+                    DB::raw('((COUNT(user_topic_progress.id) + IFNULL(AVG(marking_result_scores.score), 0)) / 2) as performance_score')
+                )
+                ->groupBy('users.id', 'users.firstname', 'users.lastname')
+                ->orderBy('performance_score', 'DESC')
+                ->limit(10)  // Get the top 10 students
+                ->get();
+    
+            if ($topStudents->isNotEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Study top scorer fetched successfully',
+                    'data' => $topStudents
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'No data found'
+                ]);
+            }
+        } catch (\Exception $e) {
             return response()->json([
-                'status' => 'success',
-                'message' => 'Study top scorer fetched successfully',
-                'data' => $topStudents
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'No data found'
-            ]);
+                'error' => 'Unable to retrieve top study students.',
+                'message' => $e->getMessage(),
+            ], 500);
         }
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Unable to retrieve top study students.',
-            'message' => $e->getMessage(),
-        ], 500);
     }
-}
 
 
     
