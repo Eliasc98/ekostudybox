@@ -71,10 +71,10 @@ class EkostudyAdminController extends Controller
     public function getStudentReportByClass($school_id, $class_id)
 {
     try {
-
         $query = DB::table('users')
             ->leftJoin('user_topic_progress', 'users.id', '=', 'user_topic_progress.user_id')
-            ->leftJoin('marking_result_scores', 'users.id', '=', 'marking_result_scores.user_study_marking_id')
+            ->leftJoin('user_study_markings', 'users.id', '=', 'user_study_markings.user_id')
+            ->leftJoin('marking_result_scores', 'user_study_markings.id', '=', 'marking_result_scores.user_study_marking_id')
             ->select(
                 'users.id as student_id',
                 'users.firstname',
@@ -85,7 +85,6 @@ class EkostudyAdminController extends Controller
             )
             ->where('users.school_id', $school_id);
 
-       
         if ($class_id) {
             $query->where('users.admin_class_id', $class_id);
         }
@@ -112,6 +111,7 @@ class EkostudyAdminController extends Controller
         ], 500);
     }
 }
+
 
     public function getAssessmentTopStudents()///top 10 assessment scorers
 {
